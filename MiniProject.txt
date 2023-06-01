@@ -1,0 +1,176 @@
+import java.io.*;
+import java.util.*;
+
+class Patient {
+    private String id;
+    private String name;
+    private int age;
+    private String gender;
+    private String aadharCardNumber;
+    private String contactNumber;
+    private String city;
+    private String address;
+    private String dateOfAdmission;
+    private String guardianName;
+    private String guardianAddress;
+    private String guardianContactNumber;
+    private boolean isRecovered;
+public Patient(String id, String name, int age, String gender, String aadharCardNumber, String contactNumber,
+                   String city, String address, String dateOfAdmission, String guardianName, String guardianAddress,
+                   String guardianContactNumber) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+        this.aadharCardNumber = aadharCardNumber;
+        this.contactNumber = contactNumber;
+        this.city = city;
+        this.address = address;
+        this.dateOfAdmission = dateOfAdmission;
+        this.guardianName = guardianName;
+        this.guardianAddress = guardianAddress;
+        this.guardianContactNumber = guardianContactNumber;
+        this.isRecovered = false;
+    }
+
+    
+
+    public void markRecovered() {
+        this.isRecovered = true;
+    }
+public String toString() {
+        return "ID: " + id +
+                "\nName: " + name +
+                "\nAge: " + age +
+                "\nGender: " + gender +
+                "\nAadhar Card Number: " + aadharCardNumber +
+                "\nContact Number: " + contactNumber +
+                "\nCity: " + city +
+                "\nAddress: " + address +
+                "\nDate of Admission: " + dateOfAdmission +
+                "\nGuardian's Name: " + guardianName +
+                "\nGuardian's Address: " + guardianAddress +
+                "\nGuardian's Contact Number: " + guardianContactNumber +
+                "\nRecovered: " + (isRecovered ? "Yes" : "No");
+    }
+}
+
+class HospitalManagementSystem {
+    private List<Patient> patients;
+
+    public HospitalManagementSystem() {
+        patients = new ArrayList<>();
+    }
+
+    public void addPatient(Patient patient) {
+        patients.add(patient);
+    }
+
+    public void listAllPatients() {
+        if (patients.isEmpty()) {
+            System.out.println("No patients found.");
+            return;
+        }
+
+        for (Patient patient : patients) {
+            System.out.println(patient);
+            System.out.println("--------------------");
+        }
+    }
+
+    public Patient getPatientById(String id) {
+        for (Patient patient : patients) {
+            if (patient.getId().equals(id)) {
+                return patient;
+            }
+        }
+        return null;
+    }
+
+    public List<Patient> getPatientsByCity(String city) {
+        List<Patient> result = new ArrayList<>();
+        for (Patient patient : patients) {
+            if (patient.getCity().equalsIgnoreCase(city)) {
+                result.add(patient);
+            }
+        }
+        return result;
+    }
+
+    public List<Patient> getPatientsByAgeGroup(int minAge, int maxAge) {
+        List<Patient> result = new ArrayList<>();
+        for (Patient patient : patients) {
+            if (patient.getAge() >= minAge && patient.getAge() <= maxAge) {
+                result.add(patient);
+            }
+        }
+        return result;
+    }
+
+    public void markPatientRecovered(String id) {
+        Patient patientToRecover = getPatientById(id);
+        if (patientToRecover != null) {
+            patientToRecover.markRecovered();
+            System.out.println("Patient with ID " + id + " marked as recovered.");
+        } else {
+            System.out.println("Patient with ID " + id + " not found.");
+        }
+    }
+
+    public void deletePatient(String id) {
+        Patient patientToRemove = null;
+        for (Patient patient : patients) {
+            if (patient.getId().equals(id)) {
+                patientToRemove = patient;
+                break;
+            }
+        }
+
+        if (patientToRemove != null) {
+            patients.remove(patientToRemove);
+            System.out.println("Patient with ID " + id + " deleted successfully.");
+        } else {
+            System.out.println("Patient with ID " + id + " not found.");
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        HospitalManagementSystem hospitalManagementSystem = new HospitalManagementSystem();
+
+        // Read patient records from CSV file
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("patients.csv"));
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] fields = line.split(",");
+                String id = fields[0];
+                String name = fields[1];
+                int age = Integer.parseInt(fields[2]);
+                String gender = fields[3];
+                String aadharCardNumber = fields[4];
+                String contactNumber = fields[5];
+                String city = fields[6];
+                String address = fields[7];
+                String dateOfAdmission = fields[8];
+                String guardianName = fields[9];
+                String guardianAddress = fields[10];
+                String guardianContactNumber = fields[11];
+
+                Patient patient = new Patient(id, name, age, gender, aadharCardNumber, contactNumber, city, address,
+                        dateOfAdmission, guardianName, guardianAddress, guardianContactNumber);
+                hospitalManagementSystem.addPatient(patient);
+            }
+            br.close();
+        } catch (IOException e) {
+            System.out.println("Error reading patient records from CSV file.");
+        } catch (NumberFormatException e) {
+            System.out.println("Error parsing patient age from CSV file.");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("Invalid number of fields in the CSV file.");
+        }
+
+       
+    }
+}
